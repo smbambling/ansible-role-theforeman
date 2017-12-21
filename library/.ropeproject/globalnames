@@ -1,0 +1,29 @@
+€}q(U%ansible-module-foreman.foreman_subnet]q(Uforemanclient_foundqUget_resourcesqUget_organization_idsqUDOCUMENTATIONqUensureqUEXAMPLESqUget_location_idsq	Umainq
+eU%ansible-module-foreman.foreman_medium]q(hh	hhhhh
+eU$ansible-module-foreman.foreman_realm]q(hhhhhh
+eUsensu_silence]q(URETURNqUclearqhUANSIBLE_METADATAqhUqueryqh
+UcreateqeU%ansible-module-foreman.foreman_filter]q(hhhhUget_permission_idsqUget_role_idqh
+eU$ansible-module-foreman.foreman_image]q(hhhhhh
+eUarin_foreman_domain]q(hhUremoveqhhhhh
+eU*ansible-module-foreman.foreman_smart_proxy]q(h
+hhheU/ansible-module-foreman.foreman_compute_resource]q(hh	Uget_provider_paramsqhhhhh
+eU.ansible-module-foreman.foreman_config_template]q(hhh	hhhUdict_list_to_listqh
+Uequal_dict_listsqeU%ansible-module-foreman.foreman_ptable]q(hh	hhhh
+eU+ansible-module-foreman.foreman_organization]q (h
+hhheU#ansible-module-foreman.foreman_host]q!(h
+hhhUget_resourceq"eU(ansible-module-foreman.foreman_hostgroup]q#(hhUsplit_parentq$hhUfilter_hostgroupq%h
+h"eU.ansible-module-foreman.foreman_compute_profile]q&(h
+hhhheU2ansible-module-foreman.foreman_os_default_template]q'(h
+hhhheU&ansible-module-foreman.foreman_setting]q((hhUupdate_settingq)hhUfake_settingq*h
+eU1ansible-module-foreman.foreman_external_usergroup]q+(hhUget_idq,hhh
+eU#ansible-module-foreman.foreman_ldap]q-(hUget_user_idsq.hhhh
+eU+ansible-module-foreman.foreman_architecture]q/(h
+hhhheU.ansible-module-foreman.foreman_operatingsystem]q0(hhhhhhh
+hUlist_to_dict_listq1eU(ansible-module-foreman.foreman_usergroup]q2(hUget_idsq3hhhh
+eUansible-module-foreman]U#ansible-module-foreman.foreman_role]q4(h
+hhhheU*ansible-module-foreman.foreman_environment]q5(hh	hhhhh
+eU'ansible-module-foreman.foreman_location]q6(hh.hhhh
+eU%ansible-module-foreman.foreman_domain]q7(hhhhhhh	h
+eU0ansible-module-foreman.foreman_compute_attribute]q8(h
+hhheU#ansible-module-foreman.foreman_user]q9(hhUequal_rolesq:U!extract_key_value_from_dict_arrayq;hhh
+U	get_rolesq<eUsensu_silenced]q=(Ucreateq>UDOCUMENTATIONq?UANSIBLE_METADATAq@UEXAMPLESqAUmainqBeu.
