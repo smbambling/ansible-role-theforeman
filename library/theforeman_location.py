@@ -15,11 +15,11 @@ ANSIBLE_METADATA = {'metadata_version': '1.1',
 
 DOCUMENTATION = '''
 ---
-module: theforeman_domain
+module: theforeman_location
 version_added: "2.4"
 author: Steven Bambling(@smbambling)
 
-There is a weird quirk, where this module will NOT clear all domains
+There is a weird quirk, where this module will NOT clear all locations
 but if a list is set it will make sure that those not in the list are removed
 '''
 
@@ -38,22 +38,17 @@ except ImportError:
 from ansible.module_utils.basic import AnsibleModule # NOQA
 from ansible.module_utils.urls import fetch_url # NOQA
 from ansible.module_utils.theforeman_utils import theforeman_query, \
-    theforeman_generate_locations_dict, theforeman_compare_values, \
-    theforeman_obtain_resource_id # NOQA
+    theforeman_compare_values, theforeman_obtain_resource_id # NOQA
 
 
-def create(module, name, fullname, locations, url):
-
-    # Create list of locations dictionaries
-    set_locations = theforeman_generate_locations_dict(module, url, locations)
+def create(module, name, description, url):
 
     # Query Foreman API for current Domains
-    myurl = url + "/api/domains"
+    myurl = url + "/api/locations"
     data = {
-        "domain": {
+        "location": {
           "name": name,
-          "fullname": fullname,
-          "locations": set_locations
+          "description": description,
         }
     }
     method = 'GET'
@@ -64,10 +59,10 @@ def create(module, name, fullname, locations, url):
     resource_id = theforeman_obtain_resource_id(module, myurl, data, method,
                                                 search_parameter, search_value)
 
-    # Create domain if it does not exist
+    # Create location if it does not exist
     if resource_id == 'None' or resource_id == '':
         if not module.check_mode:
-            myurl = url + "/api/domains"
+            myurl = url + "/api/locations"
             method = 'POST'
             (query_out, info) = theforeman_query(module, myurl, data, method)
             return False, query_out, True
@@ -75,17 +70,15 @@ def create(module, name, fullname, locations, url):
             return False, "Domain %s will be created" % (name), True
     else:
         # Obtain current Foreman resource values
-        myurl = url + "/api/domains/%s" % (resource_id)
+        myurl = url + "/api/locations/%s" % (resource_id)
         (query_out, info) = theforeman_query(module, myurl, data, method)
 
-        # Update domain if set/return values differ
+        # Update location if set/return values differ
         (diff_val, diff_data) = theforeman_compare_values(module, url, data,
                                                           query_out,
-                                                          "",
-                                                          set_locations,
-                                                          "", "")
+                                                          "", "", "", "")
         if diff_val != 0:
-            myurl = url + "/api/domains/%s" % (query_out['id'])
+            myurl = url + "/api/locations/%s" % (query_out['id'])
             method = 'PUT'
             (query_out, info) = theforeman_query(module, myurl, diff_data, method)
             return False, query_out, True
@@ -93,9 +86,9 @@ def create(module, name, fullname, locations, url):
         return False, query_out, False
 
 
-def remove(module, name, fullname, locations, url):
+def remove(module, name, description, url):
     # Query Foreman API for current Domains
-    myurl = url + "/api/domains/%s" % (name)
+    myurl = url + "/api/locations/%s" % (name)
     data = {
         "name": name,
     }
@@ -116,8 +109,7 @@ def main():
     module = AnsibleModule(
         argument_spec=dict(
             name=dict(type='str', required=True),
-            fullname=dict(type='str', default=""),
-            locations=dict(type='list', default=[]),
+            description=dict(type='str', default=""),
             url=dict(required=False, default='https://127.0.01:443'),
             url_username=dict(type='str', default='admin'),
             url_password=dict(type='str', no_log=True, required=True),
@@ -127,8 +119,7 @@ def main():
     )
 
     name = module.params['name']
-    fullname = module.params['fullname']
-    locations = module.params['locations']
+    description = module.params['description']
     url = module.params['url']
     module.params['force_basic_auth'] = True
     module.params['url_username']
@@ -139,12 +130,12 @@ def main():
 
     if state == 'present':
         (rc, query_out, changed) = create(
-            module, name, fullname, locations, url
+            module, name, description, url
         )
 
     if state == 'absent':
         (rc, query_out, changed) = remove(
-            module, name, fullname, locations, url
+            module, name, description, url
         )
 
     if rc != 0:

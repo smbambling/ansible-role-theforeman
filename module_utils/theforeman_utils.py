@@ -1,30 +1,4 @@
 # This code is part of Ansible, but is an independent component.
-# This particular file snippet, and this file snippet only, is BSD licensed.
-# Modules you write using this snippet, which is embedded dynamically by Ansible
-# still belong to the author of the module, and may assign their own license
-# to the complete work.
-#
-# Copyright (c), Steven Bambling <smbambling@gmail.com>, 2017-2018
-# All rights reserved.
-#
-# Redistribution and use in source and binary forms, with or without modification,
-# are permitted provided that the following conditions are met:
-#
-#    * Redistributions of source code must retain the above copyright
-#      notice, this list of conditions and the following disclaimer.
-#    * Redistributions in binary form must reproduce the above copyright notice,
-#      this list of conditions and the following disclaimer in the documentation
-#      and/or other materials provided with the distribution.
-#
-# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
-# ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-# WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
-# IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
-# INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
-# PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-# INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
-# LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
-# USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 try:
     import json
@@ -66,7 +40,7 @@ def theforeman_query(module, url, data, method):
 
 # Obtain ID of Foreman resource based on specified parameter
 def theforeman_obtain_resource_id(module, url, data, method,
-                               search_parameter, search_value):
+                                  search_parameter, search_value):
     (query_out, info) = theforeman_query(module, url, data, method)
 
     for i in query_out['results']:
@@ -88,9 +62,10 @@ def theforeman_generate_domains_dict(module, url, domains):
     if domains:
         for i in domains:
             search_value = i
-            domain_id = theforeman_obtain_resource_id(module, myurl, data, method,
-                                                   search_parameter,
-                                                   search_value)
+            domain_id = theforeman_obtain_resource_id(module, myurl, data,
+                                                      method,
+                                                      search_parameter,
+                                                      search_value)
             domain_dict = {"id": domain_id}
             set_domains.append(domain_dict.copy())
 
@@ -109,9 +84,9 @@ def theforeman_generate_locations_dict(module, url, locations):
         for i in locations:
             search_value = i
             location_id = theforeman_obtain_resource_id(module, myurl, data,
-                                                     method,
-                                                     search_parameter,
-                                                     search_value)
+                                                        method,
+                                                        search_parameter,
+                                                        search_value)
             location_dict = {"id": location_id}
             set_locations.append(location_dict.copy())
 
@@ -129,13 +104,35 @@ def theforeman_generate_organizations_dict(module, url, organizations):
     if organizations:
         for i in organizations:
             search_value = i
-            organization_id = theforeman_obtain_resource_id(module, myurl, data, method,
-                                                         search_parameter,
-                                                         search_value)
+            organization_id = theforeman_obtain_resource_id(module, myurl,
+                                                            data, method,
+                                                            search_parameter,
+                                                            search_value)
             organization_dict = {"id": organization_id}
             set_organizations.append(organization_dict.copy())
 
     return set_organizations
+
+
+# Generate list of operatingsystem IDs
+def theforeman_gen_os_ids(module, url, operatingsystems):
+    set_operatingsystems = []
+    myurl = url + "/api/operatingsystems"
+    data = {}
+    method = 'GET'
+    search_parameter = 'description'
+
+    if operatingsystems:
+        for i in operatingsystems:
+            search_value = i
+            operatingsystem_id = theforeman_obtain_resource_id(module, myurl,
+                                                               data, method,
+                                                               search_parameter, # NOQA
+                                                               search_value)
+            operatingsystem_dict = {"id": operatingsystem_id}
+            set_operatingsystems.append(operatingsystem_dict.copy())
+
+    return set_operatingsystems
 
 
 # Parse input to generate list of resource IDs
@@ -150,8 +147,9 @@ def theforeman_parse_resource_id(resources):
 
 
 # Compare current values against provided values
-def theforeman_compare_query_values(module, url, query_data, query_out,
-                                 domains=[], locations=[], organizations=[]):
+def theforeman_compare_values(module, url, query_data, query_out,
+                              domains=[], locations=[],
+                              organizations=[], operatingsystems=[]):
 
     # Set update trigger variable
     diff_val = 0
@@ -159,25 +157,36 @@ def theforeman_compare_query_values(module, url, query_data, query_out,
     for i in query_data.keys():
         if domains:
             set_domains = theforeman_parse_resource_id(domains)
-            assigned_domains = theforeman_parse_resource_id(query_out['domains'])
+            assigned_domains = theforeman_parse_resource_id(query_out['domains']) # NOQA
         else:
             set_domains = []
-            if i != 'domain':
-                assigned_domains = theforeman_parse_resource_id(query_out['domains'])
+            if 'domain' in query_data[i].keys():
+                assigned_domains = theforeman_parse_resource_id(query_out['domains']) # NOQA
                 query_data.update({"domains": [{"id": ""}]})
             else:
                 assigned_domains = []
 
         if locations:
             set_locations = theforeman_parse_resource_id(locations)
-            assigned_locations = theforeman_parse_resource_id(query_out['locations'])
+            assigned_locations = theforeman_parse_resource_id(query_out['locations']) # NOQA
         else:
             set_locations = []
-            if i != 'location':
-                assigned_locations = theforeman_parse_resource_id(query_out['locations'])
+            if 'locations' in query_data[i].keys():
+                assigned_locations = theforeman_parse_resource_id(query_out['locations']) # NOQA
                 query_data.update({"locations": [{"id": ""}]})
             else:
                 assigned_locations = []
+
+        if operatingsystems:
+            set_operatingsystems = theforeman_parse_resource_id(operatingsystems) # NOQA
+            assigned_operatingsystems = theforeman_parse_resource_id(query_out['operatingsystems']) # NOQA
+        else:
+            set_operatingsystems = []
+            if 'operatingsystems' in query_data[i].keys():
+                assigned_operatingsystems = theforeman_parse_resource_id(query_out['operatingsystems']) # NOQA
+                query_data.update({"operatingsystems": [{"id": ""}]})
+            else:
+                assigned_operatingsystems = []
 
         for key, val in query_data[i].iteritems():
             if key == 'domains':
@@ -185,6 +194,9 @@ def theforeman_compare_query_values(module, url, query_data, query_out,
                     diff_val = diff_val + 1
             elif key == 'locations':
                 if set(set_locations) != set(assigned_locations):
+                    diff_val = diff_val + 1
+            elif key == 'operatingsystems':
+                if set(set_operatingsystems) != set(assigned_operatingsystems):
                     diff_val = diff_val + 1
             else:
                 if val != query_out[key]:

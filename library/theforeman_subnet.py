@@ -36,7 +36,7 @@ from ansible.module_utils.basic import AnsibleModule # NOQA
 from ansible.module_utils.urls import fetch_url # NOQA
 from ansible.module_utils.theforeman_utils import theforeman_query, \
     theforeman_generate_locations_dict, theforeman_generate_domains_dict, \
-    theforeman_generate_organizations_dict, theforeman_compare_query_values, \
+    theforeman_generate_organizations_dict, theforeman_compare_values, \
     theforeman_obtain_resource_id # NOQA
 
 
@@ -134,11 +134,11 @@ def create(
         (query_out, info) = theforeman_query(module, myurl, data, method)
 
         # Update domain if set/return values differ
-        (diff_val, diff_data) = theforeman_compare_query_values(module, url, data,
-                                                             query_out,
-                                                             set_domains,
-                                                             set_locations,
-                                                             set_organizations)
+        (diff_val, diff_data) = theforeman_compare_values(module, url, data,
+                                                          query_out,
+                                                          set_domains,
+                                                          set_locations,
+                                                          set_organizations)
         if diff_val != 0:
             method = 'PUT'
             (query_out, info) = theforeman_query(module, myurl, diff_data, method)
